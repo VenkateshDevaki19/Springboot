@@ -10,10 +10,14 @@ import com.AirlineReservation.DTO.AuthResponseDTO;
 import com.AirlineReservation.DTO.LoginRequestDTO;
 import com.AirlineReservation.DTO.RegisterRequestDTO;
 import com.AirlineReservation.Entity.User;
+import com.AirlineReservation.Exceptions.DuplicateResourceException;
 import com.AirlineReservation.Repository.UserRepository;
 import com.AirlineReservation.Service.UserService;
 import com.AirlineReservation.Util.JwtUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class UserServiceImplementation implements UserService{
 
@@ -32,6 +36,10 @@ public class UserServiceImplementation implements UserService{
 
 	public String register(RegisterRequestDTO requestDTO) {
 		
+		if(userRepository.findByEmail(requestDTO.getEmail()).isPresent()) {
+			throw new DuplicateResourceException("Email already exists");
+		}
+		
 		User user = User.builder()
 				.name(requestDTO.getName())
 				.email(requestDTO.getEmail())
@@ -39,7 +47,7 @@ public class UserServiceImplementation implements UserService{
 				.role("USER") //default role
 				.build();
 		userRepository.save(user);
-		
+		log.info("User registered successfully: {}", requestDTO.getEmail());
 		return "User Registered Successfully";
 	}
 
@@ -61,7 +69,7 @@ public class UserServiceImplementation implements UserService{
 		}
 		
 		String token = jwtUtil.generateToken(user.getEmail());
-		
+		log.info("User logged in successfully: {}", user.getEmail());
 		return new AuthResponseDTO(token, "Login Successful");
 	}
 }

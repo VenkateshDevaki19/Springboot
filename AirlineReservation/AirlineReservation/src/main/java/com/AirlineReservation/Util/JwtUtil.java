@@ -1,5 +1,6 @@
 package com.AirlineReservation.Util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
@@ -19,8 +20,9 @@ public class JwtUtil {
 	//JWT expiration time
 	private static final long EXPIRATION = 1000 * 60 * 60;
 	
+	//creates signing key
 	private Key getSignKey() {
-		return Keys.hmacShaKeyFor(SECERT.getBytes());
+		return Keys.hmacShaKeyFor(SECERT.getBytes(StandardCharsets.UTF_8));
 	}
 	
 	//GENERATE JWT TOKEN
