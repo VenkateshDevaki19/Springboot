@@ -11,6 +11,8 @@ import com.AirlineReservation.DTO.LoginRequestDTO;
 import com.AirlineReservation.DTO.RegisterRequestDTO;
 import com.AirlineReservation.Service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -18,13 +20,15 @@ public class AuthController {
 	@Autowired
 	private UserService userService;
 	
+	//Register API end point
 	@PostMapping("/register")
-	public String register(@RequestBody RegisterRequestDTO dto) {
+	public String register(@Valid @RequestBody RegisterRequestDTO dto) {
 		return userService.register(dto);
 	}
 	
+	//Login Endpoint
 	@PostMapping("/login")
-	public AuthResponseDTO login( @RequestBody LoginRequestDTO dto) {
+	public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO dto) {
 		return userService.login(dto);
 	}
 }

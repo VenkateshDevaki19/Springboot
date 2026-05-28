@@ -44,7 +44,7 @@ public class UserServiceImplementation implements UserService{
 				.name(requestDTO.getName())
 				.email(requestDTO.getEmail())
 				.password(passwordEncoder.encode(requestDTO.getPassword()))
-				.role("USER") //default role
+				.role("ADMIN") //default role
 				.build();
 		userRepository.save(user);
 		log.info("User registered successfully: {}", requestDTO.getEmail());
@@ -58,18 +58,25 @@ public class UserServiceImplementation implements UserService{
 				.findByEmail(requestDTO.getEmail())
 				.orElseThrow(() -> new RuntimeException("User not found"));
 		
+		log.info("user details fetched sucessfully : {}", user.getEmail());
 		//validate password
 		boolean isMatch = passwordEncoder.matches(
 						requestDTO.getPassword(), 
 						user.getPassword());
 		
+		String sample = isMatch ? "Login successfull" : "Invalid password/username" ;
+		
+		log.info("Password validation : {}", isMatch ? true : false);
+		
 		if(!isMatch) {
+			log.info("User password entered wrongly");
 			throw new RuntimeException("Invalid Password");
-			//throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
 		}
 		
 		String token = jwtUtil.generateToken(user.getEmail());
+		
 		log.info("User logged in successfully: {}", user.getEmail());
-		return new AuthResponseDTO(token, "Login Successful");
+		
+		return new AuthResponseDTO(token, sample);
 	}
 }
