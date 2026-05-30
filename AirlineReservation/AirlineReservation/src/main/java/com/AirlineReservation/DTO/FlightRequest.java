@@ -27,10 +27,10 @@ public class FlightRequest {
 	@NotBlank(message = "Destination is required")
 	private String destination;
 	
-	@NotBlank(message = "Departure time is required")
+	@NotNull(message = "Departure time is required")
 	private LocalDateTime departureTime;
 	
-	@NotBlank(message = "Arrival time is required")
+	@NotNull(message = "Arrival time is required")
 	private LocalDateTime arrivalTime;
 	
 	//total seats

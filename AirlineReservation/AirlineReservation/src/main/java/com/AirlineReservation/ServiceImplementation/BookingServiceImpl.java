@@ -35,28 +35,37 @@ public class BookingServiceImpl implements BookingService{
 	@Override
 	@Transactional
 	public Booking bookTickets(String email, BookingRequest request) {
+		log.info("Booking request received");
 		User user = userRepository.findByEmail(email)
-				.orElseThrow( () -> new ResourceNotFoundException("User not found"));
+				.orElseThrow( () -> new ResourceNotFoundException("User not found: "+ email));
+		
+		log.info("User email: {}", email);
 		
 		Flight flight = flightRepository.findById(request.getFlightId())
-				.orElseThrow( () -> new ResourceNotFoundException("Flight not found"));
+				.orElseThrow( () -> new ResourceNotFoundException("Flight not found: "+ request.getFlightId()));
+		
+		log.info("Flight ID: {}", request.getFlightId());
 		
 		// seats availability 
 		if(flight.getAvailableSeats() < request.getSeats()) {
-			throw new InsufficientSeatsException("Not enough seats available");
+			throw new InsufficientSeatsException("Not enough seats. Available: " + flight.getAvailableSeats()
+            + ", Requested: " + request.getSeats());
 		}
 		
 		flight.setAvailableSeats(flight.getAvailableSeats() - request.getSeats());
 		flightRepository.save(flight);
 		
-		Booking booking  = Booking.builder()
-				.userId(user)
-				.flightId(flight)
-				.seatsBooked(request.getSeats())
-				.bookingDate(LocalDateTime.now())
-				.build();
+		log.info("Seats requested: {}", request.getSeats());
 		
-		log.info("Booking created for user : {}, flight: {}", email, flight.getFlightNumber());
+		Booking booking = Booking.builder()
+		        .user(user)       
+		        .flight(flight)   
+		        .seatsBooked(request.getSeats())
+		        .bookingDate(LocalDateTime.now())
+		        .build();
+		
+		log.info("Booking created: id={}, user={}", email);
+	
 		return bookingRepository.save(booking);
 	}
 

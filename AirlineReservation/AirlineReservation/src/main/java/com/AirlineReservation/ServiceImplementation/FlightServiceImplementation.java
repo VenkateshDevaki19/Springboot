@@ -9,10 +9,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.AirlineReservation.DTO.FlightRequest;
 import com.AirlineReservation.Entity.Flight;
 import com.AirlineReservation.Exceptions.ResourceNotFoundException;
+import com.AirlineReservation.Repository.BookingRepository;
 import com.AirlineReservation.Repository.FlightRepository;
 import com.AirlineReservation.Service.FlightServiceInt;
 
@@ -26,6 +28,9 @@ public class FlightServiceImplementation implements FlightServiceInt{
 	
 	@Autowired
 	private FlightRepository flightRepository;
+	
+	@Autowired
+	private BookingRepository bookingRepository;
 
 	@Override
 	public Flight addFlight1(Flight flight) {	
@@ -52,7 +57,7 @@ public class FlightServiceImplementation implements FlightServiceInt{
 
 	@Override
 	public Flight addFlight(FlightRequest request) {
-		log.info("Service - Started business");
+		log.info("Adding flight: {}", request.getFlightNumber());
 		Flight flight = Flight.builder()
 				.flightNumber(request.getFlightNumber())
 				.origin(request.getOrigin())
@@ -68,30 +73,38 @@ public class FlightServiceImplementation implements FlightServiceInt{
 	}
 
 	@Override
-	public Flight updateFlight(Long id, FlightRequest request) {
-		Flight flight = flightRepository.findById(id)
-				.orElseThrow( () -> new ResourceNotFoundException("Flight not found"));
+	@Transactional
+	public void deleteFlight(String flightNumber) {
+//		log.info("Deleting flight {}", id);
+//		Flight flight = flightRepository.findById(id)
+//				.orElseThrow( () -> new ResourceNotFoundException("Flight not found"));
+//		log.info("Flight Details: {}", flight.getFlightNumber());
+//		bookingRepository.deleteById(id);
+//		flightRepository.delete(flight);
+//		log.info("Flight Deleted: {}", id);
 		
-		flight.setFlightNumber(request.getFlightNumber());
-		flight.setOrigin(request.getOrigin());
-		flight.setDestination(request.getDestination());
-		flight.setDepartureTime(request.getDepartureTime());
-		flight.setArrivalTime(request.getArrivalTime());
-		flight.setAvailableSeats(request.getAvailableSeats());
-		flight.setPrice(request.getPrice());
-		
-		log.info("Flight Updated: ", id);
-		return flightRepository.save(flight);
+		Flight flight = flightRepository.findByFlightNumber(flightNumber)
+	            .orElseThrow(() -> new ResourceNotFoundException("Flight not found: " + flightNumber));
+	    bookingRepository.deleteByFlightId(flight.getId());
+	    flightRepository.delete(flight);
 	}
 
 	@Override
-	public void deleteFlight(Long id) {
-		Flight flight = flightRepository.findById(id)
-				.orElseThrow( () -> new ResourceNotFoundException("Flight not found"));
-		
-		flightRepository.delete(flight);
-		log.info("Flight Deleted: ", id);
-		
+	public Flight updateFlight(String flightNumber, FlightRequest request) {
+		    Flight flight = flightRepository.findByFlightNumber(flightNumber)
+		            .orElseThrow(() -> new ResourceNotFoundException("Flight not found: " + flightNumber));
+
+		    flight.setFlightNumber(request.getFlightNumber());
+		    flight.setOrigin(request.getOrigin());
+		    flight.setDestination(request.getDestination());
+		    flight.setDepartureTime(request.getDepartureTime());
+		    flight.setArrivalTime(request.getArrivalTime());
+		    flight.setTotalSeats(request.getTotalSeats());
+		    flight.setAvailableSeats(request.getAvailableSeats());
+		    flight.setPrice(request.getPrice());
+
+		    log.info("Flight Updated: {}", flightNumber);
+		    return flightRepository.save(flight);
 	}
 
 }

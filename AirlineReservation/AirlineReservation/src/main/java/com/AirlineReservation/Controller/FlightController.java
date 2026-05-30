@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +54,7 @@ public class FlightController {
 		return serviceImplementation.getAllFlights(page, size);
 	}
 	
+	//working
 	@GetMapping("/search")
 	private List<Flight> searchFlights(@RequestParam String origin, @RequestParam String destination){
 		logger.debug("method has reached to search flight 1", origin);
@@ -62,14 +64,14 @@ public class FlightController {
 	}
 	
 	@PutMapping("/{id}")
-	public Flight updateFlight(@PathVariable Long id, @Valid @RequestBody FlightRequest flight) {
+	public Flight updateFlight(@PathVariable String id, @Valid @RequestBody FlightRequest flight) {
 		return serviceImplementation.updateFlight(id, flight);
 	}
 	
-	public String deleteFlight(@PathVariable Long id) {
-		
-		serviceImplementation.deleteFlight(id);
-		
+	@DeleteMapping("/delete/{flightNumber}")
+	public String deleteFlight(@PathVariable String flightNumber) {
+		log.info("Controller {} : ", flightNumber);
+		serviceImplementation.deleteFlight(flightNumber);
 		return "Flight deleted successfully!";
 	}
 

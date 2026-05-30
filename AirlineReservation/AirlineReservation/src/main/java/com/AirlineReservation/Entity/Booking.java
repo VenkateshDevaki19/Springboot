@@ -30,14 +30,13 @@ public class Booking {
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	private User userId;
+	private User user;
 	
 	@ManyToOne
 	@JoinColumn(name = "flight_id")
-	private Flight flightId;
+	private Flight flight;
 	
 	private Integer seatsBooked;
 	
 	private LocalDateTime bookingDate;
-
 }

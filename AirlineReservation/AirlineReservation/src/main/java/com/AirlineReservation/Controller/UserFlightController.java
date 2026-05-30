@@ -18,7 +18,7 @@ public class UserFlightController {
 	@Autowired
 	private FlightServiceImplementation flightServiceImplementation;
 
-	//Search Flights
+	//Search Flights -working
 	@GetMapping("/search")
 	public List<Flight> searchFlight(@RequestParam String origin, @RequestParam String destination){
 		

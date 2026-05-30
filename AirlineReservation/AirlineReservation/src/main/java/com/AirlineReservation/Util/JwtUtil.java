@@ -10,17 +10,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-// utility class for JWT operations
 @Component
 public class JwtUtil {
 	
-	//secret key for Jwt signing
-	public static final String SECERT = "mysecretkeymysecretkeymysecretkey12345"; //MUST have a size >= 256 bits
+	//Utility class for JWT operations
+	//Secret key for Jwt signing
+	//MUST have a size >= 256 bits
+	public static final String SECERT = "mysecretkeymysecretkeymysecretkey12345";
 	
 	//JWT expiration time
-	private static final long EXPIRATION = 1000 * 60 * 60;
+	private static final long EXPIRATION = 1000 * 60 * 60 * 24; //token expiry time
 	
-	//creates signing key
+	//Creates signing key
 	private Key getSignKey() {
 		return Keys.hmacShaKeyFor(SECERT.getBytes(StandardCharsets.UTF_8));
 	}
@@ -29,7 +30,7 @@ public class JwtUtil {
 	public String generateToken(String email) {
 		
 		return Jwts.builder().setSubject(email)
-				.setIssuedAt(new Date())
+				.setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis()+EXPIRATION))
 				.signWith(getSignKey(), SignatureAlgorithm.HS256)
 				.compact();
@@ -40,13 +41,14 @@ public class JwtUtil {
 		
 		return Jwts.parserBuilder()
 				.setSigningKey(getSignKey())
+				.setAllowedClockSkewSeconds(60)
 				.build()
 				.parseClaimsJws(token)
 				.getBody()
 				.getSubject();
 	}
 
-	//validate JWT token
+	//Validate JWT token
 	public boolean validateToken(String token, String email) {
 		
 		String extractedEmail = extractEmail(token);

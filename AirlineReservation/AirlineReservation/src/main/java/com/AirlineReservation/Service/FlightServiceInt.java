@@ -15,10 +15,12 @@ public interface FlightServiceInt {
 	Flight addFlight1(Flight flight);
 	
 	//update flight
-	Flight updateFlight(Long id, FlightRequest request);
+	//Flight updateFlight(String id, FlightRequest request);
+	
+	Flight updateFlight(String flightNumber, FlightRequest request);
 	
 	//delete flight
-	void deleteFlight(Long id);
+	void deleteFlight(String flightNumber);
 	
 	//get all flights
 	Page<Flight> getAllFlights(int page, int size);
